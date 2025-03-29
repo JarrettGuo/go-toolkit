@@ -1,0 +1,45 @@
+global:
+ scrape_interval: 15s      # Default scrape interval, fetches data from targets every 15 seconds
+ evaluation_interval: 15s  # Evaluate rules every 15 seconds
+ scrape_timeout: 10s       # Scrape timeout
+
+# Alertmanager configuration
+alerting:
+ alertmanagers:
+   - static_configs:
+       - targets:
+         # - alertmanager:9093 # Uncomment if Alertmanager is configured
+
+# After initial loading, rules are loaded into memory and evaluated every 'evaluation_interval'
+rule_files:
+ # - "first_rules.yml"
+ # - "second_rules.yml"
+
+# Scrape configurations
+scrape_configs:
+ # Monitor the Prometheus server itself
+ - job_name: 'prometheus'
+   static_configs:
+     - targets: ['localhost:9090']
+
+ # Redis monitoring
+ - job_name: 'redis'
+   static_configs:
+     - targets: ['redis:6379']
+   metrics_path: /metrics
+
+ # Rate limiter API service monitoring
+ - job_name: 'ratelimit-api'
+   static_configs:
+     # Assuming the API service runs on host port 8080
+     # Using host.docker.internal to access the host machine's service from inside the container
+     - targets: ['host.docker.internal:8080']
+   metrics_path: /metrics
+   scrape_interval: 5s  # Use more frequent scraping for API service
+
+ # Add more job_name entries here for future services
+
+ # Example: monitoring other container services
+ # - job_name: 'other-service'
+ #   static_configs:
+ #     - targets: ['other-service:8080']
